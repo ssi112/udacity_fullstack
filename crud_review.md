@@ -1,6 +1,6 @@
-##CRUD Review
+## CRUD Review
 
-###Operations with SQLAlchemy
+### Operations with SQLAlchemy
 
 In this lesson, we performed all of our CRUD operations with SQLAlchemy on an SQLite database. Before we perform any operations, we must first import the necessary libraries, connect to our restaurantMenu.db, and create a session to interface with the database:
 ```
@@ -61,7 +61,7 @@ Then we updated the price of the veggie burger to $2.99:
 UrbanVeggieBurger = session.query(MenuItem).filter_by(id=8).one()
 UrbanVeggieBurger.price = '$2.99'
 session.add(UrbanVeggieBurger)
-session.commit() 
+session.commit()
 ```
 **DELETE**
 
@@ -75,5 +75,17 @@ We deleted spinach Ice Cream from our Menu Items database with the following ope
 ```
 spinach = session.query(MenuItem).filter_by(name = 'Spinach Ice Cream').one()
 session.delete(spinach)
-session.commit() 
+session.commit()
 ```
+
+### Adding CRUD Operations to Restaurant Website
+
+**Update webserver.py and webserver_v2.py**
+
+ 1. List all Restaurants (http://localhost:8080/restaurants)
+ 2. Add / Edit / Delete links for each restaurant in list
+ 3. Add a restaurant (http://localhost:8080/restaurants/new) - form for creating a new restaurant
+ 4. Rename a restaurant (http://localhost:8080/restaurant/id/edit) - form to edit existing restaurant
+ 5. Delete a restaurant (http://localhost:8080/restaurant/id/delete) - confirmation page to send post to delete selected restaurant
+ 
+ 

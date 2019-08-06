@@ -17,6 +17,42 @@ Virtual machine for the [Relational Databases](https://www.udacity.com/course/in
 
 ## Intro
 
+### Python Version Notes
+The VM as the course was written uses Python 2.7.12. Lesson 2 Making a Webserver makes use of BaseHTTPServer which is deprecated in favor of http.server in version 3 or greater. Reference this [doc](https://docs.python.org/2/library/basehttpserver.html) for additional information.
+
+The python source files appended with '\_v2.py' should work with that version. Those without '\_v2.py' are written for Python version 3 or greater. These files use [http-server](https://docs.python.org/3.5/library/http.server.html).
+
+Assuming you have everything you need installed on your computer, it is not necessary to run the VM as presented in the course, but can be good practice to set one up and work on it.
+
+### Vagrant Notes
+I made a modification to the Vagrantfile in order to access the working directory once the VM is running. You may not need to do this, but if you do your path will most certainly be different!
+
+These lines were added:
+_config.vm.synced_folder "/media/ssi112/Data/dev/udacity/fullstack", "/vagrant/fullstack",
+id: "fullstack" # <--- this ID must be unique_
+```
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.box_version = "= 2.3.5"
+  # config.vm.synced_folder ".", "/vagrant"
+  config.vm.synced_folder ".", "/vagrant",
+      id: "vagranthome" # <--- this ID must be unique
+  config.vm.synced_folder "/media/ssi112/Data/dev/udacity/fullstack", "/vagrant/fullstack",
+      id: "fullstack" # <--- this ID must be unique
+  config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
+
+  # Work around disconnected virtual network cable.
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
+```
+
+Also, refer to Lesson 2: Making a Web Server, Concept 6. Port Forwarding
+
+<hr /> 
+
 In the next part of this course, you'll use a virtual machine (VM) to run an SQL database server and a web app that uses it. The VM is a Linux server system that runs on top of your own computer. You can share files easily between your computer and the VM; and you'll be running a web service inside the VM which you'll be able to access from your regular browser.
 
 We're using tools called [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/wiki/Download_Old_Builds_5_1) to install and manage the VM. You'll need to install these to do some of the exercises. The instructions on this page will help you do this.

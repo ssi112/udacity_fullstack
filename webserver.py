@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 # version >= 3
+# https://docs.python.org/3.5/library/http.server.html
+#
 # note the use of bytes() to convert string to bytes with encoding UTF-8
 #
 # if [Errno 98] Address already in use
@@ -79,19 +82,18 @@ class webserverHandler(BaseHTTPRequestHandler):
                     print("Fields value is", fields)
                     messagecontent = fields.get('message')
                     print("Message is ", messagecontent[0].decode("utf-8"))
-                    self.send_response(301)
+                    self.send_response(200)
                     self.send_header('Content-type', 'text/html')
                     self.send_header('Location', '/hello')
                     self.end_headers()
-
-            output = ""
-            output += "<html><body>"
-            output += " <h2> Okay, how about this: </h2>"
-            output += "<h1> %s </h1>" % messagecontent[0]
-            output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
-            output += "</body></html>"
-            self.wfile.write(bytes(output, "utf-8"))
-            print(output)
+                    output = ""
+                    output += "<html><body>"
+                    output += " <h2> Okay, how about this: </h2>"
+                    output += "<h1> %s </h1>" % messagecontent[0].decode("utf-8")
+                    output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
+                    output += "</body></html>"
+                    self.wfile.write(bytes(output, "utf-8"))
+            # print(output)
         except:
             print("Inside the exception block")
 

@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
 # this is for version < 3 python
+# https://docs.python.org/2/library/basehttpserver.html
+
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+# common gateway interface to process data submitted thru <form>
 import cgi
 
 
@@ -27,7 +31,8 @@ class webServerHandler(BaseHTTPRequestHandler):
                 output = ""
                 output += "<html><body>"
                 output += "<h1>&#161 Hola !</h1>"
-                output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
+                spanishStr = u"¿Qué quieres que diga?".encode("utf-8")
+                output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>'''+spanishStr+'''</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
                 output += "</body></html>"
                 self.wfile.write(output)
                 print output
