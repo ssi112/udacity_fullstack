@@ -24,6 +24,8 @@ The python source files appended with '\_v2.py' should work with that version. T
 
 Assuming you have everything you need installed on your computer, it is not necessary to run the VM as presented in the course, but can be good practice to set one up and work on it.
 
+Additional Notes:
+
 ### Vagrant Notes
 I made a modification to the Vagrantfile in order to access the working directory once the VM is running. You may not need to do this, but if you do your path will most certainly be different!
 
