@@ -6,7 +6,6 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 # common gateway interface to process data submitted thru <form>
 import cgi
 
-
 class webServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):

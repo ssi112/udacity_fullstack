@@ -11,6 +11,7 @@
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+# common gateway interface to process data submitted thru <form>
 import cgi
 
 hostName = "localhost"
