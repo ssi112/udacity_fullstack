@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# version >= 3
+# version >= 3 - lesson 2 concepts
 # https://docs.python.org/3.5/library/http.server.html
 #
 # note the use of bytes() to convert string to bytes with encoding UTF-8

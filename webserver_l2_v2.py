@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# this is for version < 3 python
+# this is for version < 3 python - lesson 2 concepts
 # https://docs.python.org/2/library/basehttpserver.html
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
