@@ -6,60 +6,50 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 # common gateway interface to process data submitted thru <form>
 import cgi
 
+# from lesson 1 database_setup.py
+from database_setup import Base, Restaurant, MenuItem
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+
+# create a db session and connect
+engine = create_engine('sqlite:///restaurantmenu.db')
+
+# Bind the engine to the metadata of the Base class so that the
+# declaratives can be accessed through a DBSession instance
+Base.metadata.bind = engine
+
+DBSession = sessionmaker(bind=engine)
+# A DBSession() instance establishes all conversations with the database
+# and represents a "staging zone" for all the objects loaded into the
+# database session object. Any change made against the objects in the
+# session won't be persisted into the database until you call
+# session.commit(). If you're not happy about the changes, you can
+# revert all of them back to the last commit by calling
+# session.rollback()
+session = DBSession()
+
 class webServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            if self.path.endswith("/hello"):
+            if self.path.endswith("/restaurants"):
+                # get all restaurants
+                restaurants = session.query(Restaurant).all()
+                output = ""
+                output += "<html><body>"
+                output += "<h1>Objective 1 - List all Restaurants</h1>"
+                output += "<ul>"
+                for restaurant in restaurants:
+                    output += "<li>" + restaurant.name + "</li>"
+                output += "</ul><h3>Python Version 2.7</h3>"
+                output += "</body></html>"
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                output = ""
-                output += "<html><body>"
-                output += "<h1>Hello!</h1>"
-                output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
-                output += "</body></html>"
                 self.wfile.write(output)
-                print output
                 return
-
-            if self.path.endswith("/hola"):
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
-                output = ""
-                output += "<html><body>"
-                output += "<h1>&#161 Hola !</h1>"
-                spanishStr = u"¿Qué quieres que diga?".encode("utf-8")
-                output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>'''+spanishStr+'''</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
-                output += "</body></html>"
-                self.wfile.write(output)
-                print output
-                return
-
         except IOError:
             self.send_error(404, 'File Not Found: %s' % self.path)
-
-    def do_POST(self):
-        try:
-            self.send_response(301)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            ctype, pdict = cgi.parse_header(
-                self.headers.getheader('content-type'))
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)
-                messagecontent = fields.get('message')
-            output = ""
-            output += "<html><body>"
-            output += " <h2> Okay, how about this: </h2>"
-            output += "<h1> %s </h1>" % messagecontent[0]
-            output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
-            output += "</body></html>"
-            self.wfile.write(output)
-            print output
-        except:
-            pass
 
 
 def main():

@@ -24,7 +24,24 @@ The python source files appended with '\_v2.py' should work with that version. T
 
 Assuming you have everything you need installed on your computer, it is not necessary to run the VM as presented in the course, but can be good practice to set one up and work on it.
 
-Additional Notes:
+**Additional Notes:**
+
+The source code presented in the beginning of lesson 2 uses a response code of 301 in the do_POST(). This works, but in the version 3 code it does not. A response code of 200 is the proper code to use.
+
+200 OK = Standard response for successful HTTP requests. The actual response will depend on the request method used. In a GET request, the response will contain an entity corresponding to the requested resource. In a POST request, the response will contain an entity describing or containing the result of the action.
+    
+301 Moved Permanently: This and all future requests should be directed to the given URI.
+
+**Source Files:**  
+Lesson 2 Concepts  
+
+  - webserver_l2.py
+  - webserver\_l2_v2.py
+
+Lesson 2 Quiz Objectives  
+
+  - webserver_v2.py
+  - webserver.py
 
 ### Vagrant Notes
 I made a modification to the Vagrantfile in order to access the working directory once the VM is running. You may not need to do this, but if you do your path will most certainly be different!

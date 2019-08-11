@@ -14,89 +14,51 @@ import time
 # common gateway interface to process data submitted thru <form>
 import cgi
 
+# from lesson 1 database_setup.py
+from database_setup import Base, Restaurant, MenuItem
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+
+# create a db session and connect
+engine = create_engine('sqlite:///restaurantmenu.db')
+
+# Bind the engine to the metadata of the Base class so that the
+# declaratives can be accessed through a DBSession instance
+Base.metadata.bind = engine
+
+DBSession = sessionmaker(bind=engine)
+# A DBSession() instance establishes all conversations with the database
+# and represents a "staging zone" for all the objects loaded into the
+# database session object. Any change made against the objects in the
+# session won't be persisted into the database until you call
+# session.commit(). If you're not happy about the changes, you can
+# revert all of them back to the last commit by calling
+# session.rollback()
+session = DBSession()
+
 hostName = "localhost"
 hostPort = 8080
 
 class webserverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path.endswith("/hello"):
+        if self.path.endswith("/restaurants"):
+            # get all restaurants
+            restaurants = session.query(Restaurant).all()
+            output = ""
+            output += "<html><body>"
+            output += "<h1>Objective 1 - List all Restaurants</h1>"
+            output += "<ul>"
+            for restaurant in restaurants:
+                output += "<li>" + restaurant.name + "</li>"
+            output += "</ul><h3>Python Version 3.6</h3>"
+            output += "</body></html>"
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write(bytes("<html><head><title>Python Simple Webserver.</title></head>", "utf-8"))
-            self.wfile.write(bytes("<body><p>Hello! This is a test.</p>", "utf-8"))
-            self.wfile.write(bytes("<p>You accessed path: %s</p>" % self.path, "utf-8"))
-            self.wfile.write(bytes('''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>''', "utf-8"))
-            self.wfile.write(bytes("</body></html>", "utf-8"))
-            """
-            ORIGINAL LESSON CODE
-            output = ""
-            output += "<html><body>Hello!</body></html>"
             self.wfile.write(bytes(output, "utf-8"))
-            print(output)
-            """
-            return
-        if self.path.endswith("/hola"):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(bytes("<html><head><title>Python Simple Webserver.</title></head>", "utf-8"))
-            self.wfile.write(bytes("<body><p>&#161 Hola! This is a test.</p>", "utf-8"))
-            self.wfile.write(bytes("<p>You accessed path: %s</p>" % self.path, "utf-8"))
-            self.wfile.write(bytes('''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>''', "utf-8"))
-            self.wfile.write(bytes("</body></html>", "utf-8"))
-            """
-            ORIGINAL LESSON CODE
-            output = ""
-            output += "<html><body>Hello!</body></html>"
-            self.wfile.write(bytes(output, "utf-8"))
-            print(output)
-            """
             return
         else:
             self.send_error(404, "File Not Found {}".format(self.path))
-
-    def do_POST(self):
-        try:
-            #######################################################################
-            # CHECKE THESE:
-            # https://stackoverflow.com/questions/42688246/do-post-method-failing-in-python-3-6
-            # https://stackoverflow.com/questions/2121481/python3-http-server-post-example
-            # https://stackoverflow.com/questions/36484184/python-make-a-post-request-using-python-3-urllib
-            #
-            # THIS MIGHT BE THE BEST ANSWER:
-            # https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3
-            #
-            # self.send_response(301)
-            # self.send_header('Content-type', 'text/html')
-            # self.end_headers()
-            # ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-            # if ctype == 'multipart/form-data':
-            #     fields = cgi.parse_multipart(self.rfile, pdict)
-            #     messagecontent = fields.get('message')
-            #######################################################################
-            if self.path.endswith("/hello"):
-                ctype, pdict = cgi.parse_header(self.headers['content-type'])
-                pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
-                if ctype == 'multipart/form-data':
-                    fields = cgi.parse_multipart(self.rfile, pdict)
-                    print("Fields value is", fields)
-                    messagecontent = fields.get('message')
-                    print("Message is ", messagecontent[0].decode("utf-8"))
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/html')
-                    self.send_header('Location', '/hello')
-                    self.end_headers()
-                    output = ""
-                    output += "<html><body>"
-                    output += " <h2> Okay, how about this: </h2>"
-                    output += "<h1> %s </h1>" % messagecontent[0].decode("utf-8")
-                    output += '''<form method='POST' enctype='multipart/form-data' action='/hello'><h2>What would you like me to say?</h2><input name="message" type="text" ><input type="submit" value="Submit"> </form>'''
-                    output += "</body></html>"
-                    self.wfile.write(bytes(output, "utf-8"))
-            # print(output)
-        except:
-            print("Inside the exception block")
 
 
 def main():

@@ -83,9 +83,12 @@ session.commit()
 **Update webserver.py and webserver_v2.py**
 
  1. List all Restaurants (http://localhost:8080/restaurants)
+ 
  2. Add / Edit / Delete links for each restaurant to appear in list
  3. Add a restaurant (http://localhost:8080/restaurants/new) - form for creating a new restaurant
+ 
  4. Rename a restaurant (http://localhost:8080/restaurant/id/edit) - form to edit existing restaurant
+ 
  5. Delete a restaurant (http://localhost:8080/restaurant/id/delete) - confirmation page to send post to delete selected restaurant
  
  
