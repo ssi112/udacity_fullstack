@@ -45,9 +45,9 @@ class webserverHandler(BaseHTTPRequestHandler):
             # get all restaurants
             restaurants = session.query(Restaurant).all()
             output = ""
-            output += "<html><body>"
+            output += "<html><head><title>List Restaurants</title></head><body>"
             output += "<h1>Objective 3 - Add New Restaurant</h1>"
-            output += "<strong><a href ='#' >Add New Restaurant </a></strong><hr />"
+            output += "<strong><a href='/restaurants/new'>Add New Restaurant</a></strong><hr />"
             output += "<table><tr><th>Restaurant</th><th colspan=\"2\">CRUD</th></tr>"
             for restaurant in restaurants:
                 output += "<tr>"
@@ -62,9 +62,43 @@ class webserverHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(bytes(output, "utf-8"))
             return
+        if self.path.endswith("/restaurants/new"):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            output = ""
+            output += "<html><head><title>New Restaurant</title></head>"
+            output += "<body><h2>Add New Restaurant</h2>"
+            output += "<form method='POST' enctype='multipart/form-data' action='/restaurants/new'>"
+            output += "<input name='newRestaurant' type='text' placeholder='Enter new restaurant name'>"
+            output += "<br /><br /><input type='submit' value='Add'>"
+            output += "</form></body></html>"
+            self.wfile.write(bytes(output, "utf-8"))
+            return
         else:
             self.send_error(404, "File Not Found {}".format(self.path))
+    def do_POST(self):
+        try:
+            if self.path.endswith("/restaurants/new"):
+                ctype, pdict = cgi.parse_header(self.headers['content-type'])
+                pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
+                if ctype == 'multipart/form-data':
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    print("Fields value is", fields)
+                    messagecontent = fields.get('newRestaurant')
+                    print("Message is ", messagecontent[0].decode("utf-8"))
 
+                    # add the restaurant - make sure it is string and not bytes
+                    newRestaurant = Restaurant(name = messagecontent[0].decode("utf-8"))
+                    session.add(newRestaurant)
+                    session.commit()
+
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
+        except:
+            print("Exception occurred")
 
 def main():
     try:
