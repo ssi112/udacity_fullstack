@@ -46,11 +46,16 @@ class webserverHandler(BaseHTTPRequestHandler):
             restaurants = session.query(Restaurant).all()
             output = ""
             output += "<html><body>"
-            output += "<h1>Objective 1 - List all Restaurants</h1>"
-            output += "<ul>"
+            output += "<h1>Objective 3 - Add New Restaurant</h1>"
+            output += "<strong><a href ='#' >Add New Restaurant </a></strong><hr />"
+            output += "<table><tr><th>Restaurant</th><th colspan=\"2\">CRUD</th></tr>"
             for restaurant in restaurants:
-                output += "<li>" + restaurant.name + "</li>"
-            output += "</ul><h3>Python Version 3.6</h3>"
+                output += "<tr>"
+                output += "<td>" + restaurant.name + "</td>"
+                output += "<td> <a href ='#' >Edit </a> </td>"
+                output += "<td> <a href ='#' >Delete </a> </td>"
+                output += "</tr>"
+            output += "</table><h3>Python Version 3.6</h3>"
             output += "</body></html>"
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
@@ -64,12 +69,11 @@ class webserverHandler(BaseHTTPRequestHandler):
 def main():
     try:
         server = HTTPServer((hostName, hostPort), webserverHandler)
-        # print("Web server running on port {}".format(port))
-        print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
+        print("Server Starting: {0} on: {1} port: {2}".format(time.asctime(), hostName, hostPort))
         server.serve_forever()
     except KeyboardInterrupt:   # ctrl-c
         print("^C entered, stopping web server...")
-        print(time.asctime(), "Server Stops - %s:%s" % (hostName, hostPort))
+        print("Server Stopped: {0}".format(time.asctime()))
         server.socket.close()
 
 if __name__ == '__main__':
