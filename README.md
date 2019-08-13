@@ -1,4 +1,6 @@
-# Full Stack Web Developer Nanodegree program virtual machine
+# Full Stack Foundations
+
+### Note that this is the free course offered by Udacity and NOT the Nanodegree program
 
 <a href="https://www.udacity.com/">
   <img src="https://s3-us-west-1.amazonaws.com/udacity-content/rebrand/svg/logo.min.svg" width="300" alt="Udacity logo">
