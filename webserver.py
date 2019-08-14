@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# version >= 3
+# version = 3.6
 # https://docs.python.org/3.5/library/http.server.html
 #
 # note the use of bytes() to convert string to bytes with encoding UTF-8
@@ -41,7 +41,8 @@ hostPort = 8080
 
 class webserverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # list all restaurants
+        # Objective #1 list all restaurants
+        # Objective #2 edit and delete links
         if self.path.endswith("/restaurants"):
             # get all restaurants
             restaurants = session.query(Restaurant).all()
@@ -53,8 +54,8 @@ class webserverHandler(BaseHTTPRequestHandler):
             for restaurant in restaurants:
                 output += "<tr>"
                 output += "<td>{0}</td>".format(restaurant.name)
-                output += "<td> <a href ='/restaurants/{0}/edit' >Edit </a> </td>".format(restaurant.id)
-                output += "<td> <a href ='#' >Delete </a> </td>"
+                output += "<td> <a href ='/restaurants/{0}/edit'> Edit </a> </td>".format(restaurant.id)
+                output += "<td> <a href ='/restaurants/{0}/delete'> Delete </a> </td>".format(restaurant.id)
                 output += "</tr>"
             output += "</table><h3>Python Version 3.6</h3>"
             output += "</body></html>"
@@ -63,7 +64,7 @@ class webserverHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(bytes(output, "utf-8"))
             return
-        # add new restaurant
+        # Objective #3 add new restaurant
         if self.path.endswith("/restaurants/new"):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
@@ -77,6 +78,7 @@ class webserverHandler(BaseHTTPRequestHandler):
             output += "</form></body></html>"
             self.wfile.write(bytes(output, "utf-8"))
             return
+        # Objective 4 edit restaurant name
         if self.path.endswith("/edit"):
             # split returns a list of words separated by '/'
             restaurantID = self.path.split("/")[2]
@@ -98,29 +100,67 @@ class webserverHandler(BaseHTTPRequestHandler):
                 output += "</body></html>"
                 self.wfile.write(bytes(output, "utf-8"))
             return
+        if self.path.endswith("/delete"):
+            restaurantID = self.path.split("/")[2]
+
+            # query for the 1st restaurant using ID
+            getRestaurant = session.query(Restaurant).filter_by(id=restaurantID).one()
+
+            # make certain we have a good ID
+            if getRestaurant:
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                output = "<html><body>"
+                output += "<h1> Name: {0} - ID #{1} </h1>".format(getRestaurant.name, restaurantID)
+                output += "<h2>Are you certain you want to delete this restaurant?</h2>"
+                output += "<form method='POST' enctype='multipart/form-data' action = '/restaurants/{0}/delete' >".format(restaurantID)
+                output += "<input type = 'submit' value = 'Delete'>"
+                output += "</form>"
+                output += "</body></html>"
+                self.wfile.write(bytes(output, "utf-8"))
+            return
         else:
             self.send_error(404, "File Not Found {0}".format(self.path))
     def do_POST(self):
         try:
-            # objective 4 - rename restaurant
+            #Objective 5 delete restaurant
+            if self.path.endswith("/delete"):
+                restaurantIDPath = self.path.split("/")[2]
+                myRestaurantQuery = session.query(Restaurant).filter_by(id=restaurantIDPath).one()
+                if myRestaurantQuery:
+                    session.delete(myRestaurantQuery)
+                    session.commit()
+                    self.send_response(301)
+                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', '/restaurants')
+                    self.end_headers()
+            # Objective 4 edit restaurant name
             if self.path.endswith("/edit"):
                 ctype, pdict = cgi.parse_header(self.headers['content-type'])
                 pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
                 if ctype == 'multipart/form-data':
+                    # ERROR on content-length with python 3.7
+                    content_len = int(self.headers.get('Content-Length'))
+
                     fields = cgi.parse_multipart(self.rfile, pdict)
                     messagecontent = fields.get('newRestaurantName')
                     restaurantID = self.path.split("/")[2]
                     getRestaurantID = session.query(Restaurant).filter_by(id=restaurantID).one()
                     if getRestaurantID != []:
                         getRestaurantID.name = messagecontent[0].decode("utf-8")
+
+                        print(content_len)
+
                         session.add(getRestaurantID)
                         session.commit()
                         self.send_response(301)
                         self.send_header('Content-type', 'text/html')
+                        # self.send_header('Content-Length', content_len)
                         self.send_header('Location', '/restaurants')
                         self.end_headers()
 
-            # objective 3 - add new restaurant
+            # Objective #3 add new restaurant
             if self.path.endswith("/restaurants/new"):
                 ctype, pdict = cgi.parse_header(self.headers['content-type'])
                 pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
@@ -138,8 +178,9 @@ class webserverHandler(BaseHTTPRequestHandler):
                     self.send_header('Content-type', 'text/html')
                     self.send_header('Location', '/restaurants')
                     self.end_headers()
-        except:
+        except Exception as ex:
             print("Exception occurred")
+            print(ex)
 
 def main():
     try:

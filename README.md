@@ -22,7 +22,10 @@ Virtual machine for the [Relational Databases](https://www.udacity.com/course/in
 ### Python Version Notes
 The VM as the course was written uses Python 2.7.12. Lesson 2 Making a Webserver makes use of BaseHTTPServer which is deprecated in favor of http.server in version 3 or greater. Reference this [doc](https://docs.python.org/2/library/basehttpserver.html) for additional information.
 
-The python source files appended with '\_v2.py' should work with that version. Those without '\_v2.py' are written for Python version 3 or greater. These files use [http-server](https://docs.python.org/3.5/library/http.server.html).
+The python source files appended with '\_v2.py' should work with that version. Those without '\_v2.py' are written for Python version 3.6. These files use [http-server](https://docs.python.org/3.5/library/http.server.html).
+
+#### NOTE - Anaconda
+*Updated Anaconda to 4.7.10 which included Python 3.7.3. Code as written began throwing Content-Length errors when updating or adding new records. Created a Python 3.6 environment to run code and works as expected. Will investigate issue with 3.7 later.*
 
 Assuming you have everything you need installed on your computer, it is not necessary to run the VM as presented in the course, but can be good practice to set one up and work on it.
 
