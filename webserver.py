@@ -13,6 +13,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 # common gateway interface to process data submitted thru <form>
 import cgi
+import traceback
 
 # from lesson 1 database_setup.py
 from database_setup import Base, Restaurant, MenuItem
@@ -137,21 +138,18 @@ class webserverHandler(BaseHTTPRequestHandler):
                     self.end_headers()
             # Objective 4 edit restaurant name
             if self.path.endswith("/edit"):
-                ctype, pdict = cgi.parse_header(self.headers['content-type'])
+                ctype, pdict = cgi.parse_header(self.headers.get('Content-Type'))
+                # ERROR on content-length with python 3.7 NEED THIS!
+                content_len = int(self.headers.get('Content-length'))
                 pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
+                pdict['CONTENT-LENGTH'] = content_len
                 if ctype == 'multipart/form-data':
-                    # ERROR on content-length with python 3.7
-                    content_len = int(self.headers.get('Content-Length'))
-
                     fields = cgi.parse_multipart(self.rfile, pdict)
-                    messagecontent = fields.get('newRestaurantName')
+                    new_name = fields.get('newRestaurantName')
                     restaurantID = self.path.split("/")[2]
                     getRestaurantID = session.query(Restaurant).filter_by(id=restaurantID).one()
                     if getRestaurantID != []:
-                        getRestaurantID.name = messagecontent[0].decode("utf-8")
-
-                        print(content_len)
-
+                        getRestaurantID.name = new_name[0]
                         session.add(getRestaurantID)
                         session.commit()
                         self.send_response(301)
@@ -162,16 +160,18 @@ class webserverHandler(BaseHTTPRequestHandler):
 
             # Objective #3 add new restaurant
             if self.path.endswith("/restaurants/new"):
-                ctype, pdict = cgi.parse_header(self.headers['content-type'])
+                ctype, pdict = cgi.parse_header(self.headers.get('Content-Type'))
+                # needed for Python 3.7
+                content_len = int(self.headers.get('Content-length'))
                 pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
+                pdict['CONTENT-LENGTH'] = content_len
                 if ctype == 'multipart/form-data':
                     fields = cgi.parse_multipart(self.rfile, pdict)
-                    print("Fields value is", fields)
+                    # print("Fields value is", fields)
                     messagecontent = fields.get('newRestaurant')
-                    print("Message is ", messagecontent[0].decode("utf-8"))
-
+                    # print("Message is ", messagecontent[0])
                     # add the restaurant - make sure it is string and not bytes
-                    newRestaurant = Restaurant(name = messagecontent[0].decode("utf-8"))
+                    newRestaurant = Restaurant(name = messagecontent[0])
                     session.add(newRestaurant)
                     session.commit()
                     self.send_response(301)
@@ -181,6 +181,7 @@ class webserverHandler(BaseHTTPRequestHandler):
         except Exception as ex:
             print("Exception occurred")
             print(ex)
+            print(traceback.format_exc())
 
 def main():
     try:

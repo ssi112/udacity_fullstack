@@ -27,9 +27,22 @@ The python source files appended with '\_v2.py' should work with that version. T
 #### NOTE - Anaconda
 *Updated Anaconda to 4.7.10 which included Python 3.7.3. Code as written began throwing Content-Length errors when updating or adding new records. Created a Python 3.6 environment to run code and works as expected. Will investigate issue with 3.7 later.*
 
-Assuming you have everything you need installed on your computer, it is not necessary to run the VM as presented in the course, but can be good practice to set one up and work on it.
+**Update on Python 3.7 vs. 3.6**
+Found solution at [StackOverflow](https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3). Where else! 
+Example code needed in the do_POST(self):
+```
+if self.path.endswith("/edit"):
+	ctype, pdict = cgi.parse_header(self.headers.get('Content-Type'))
+	# ERROR on content-length with python 3.7 NEED THIS!
+	content_len = int(self.headers.get('Content-length'))
+	pdict['boundary'] = bytes(p_dict['boundary'], "utf-8")
+	pdict['CONTENT-LENGTH'] = content_len
+	...
+```
 
-**Additional Notes:**
+#### Additional Notes:
+
+Assuming you have everything you need installed on your computer, it is not necessary to run the VM as presented in the course, but can be good practice to set one up and work on it.
 
 The source code presented in the beginning of lesson 2 uses a response code of 301 in the do_POST(). This works, but in the version 3 code it does not. A response code of 200 is the proper code to use.
 
