@@ -28,8 +28,10 @@ The python source files appended with '\_v2.py' should work with that version. T
 *Updated Anaconda to 4.7.10 which included Python 3.7.3. Code as written began throwing Content-Length errors when updating or adding new records. Created a Python 3.6 environment to run code and works as expected. Will investigate issue with 3.7 later.*
 
 **Update on Python 3.7 vs. 3.6**
-Found solution at [StackOverflow](https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3). Where else! 
-Example code needed in the do_POST(self):
+- Description of [problem](https://bugs.python.org/issue34226)
+- Found solution at [StackOverflow](https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3). Where else! 
+- Example code needed in the do_POST(self):
+
 ```
 if self.path.endswith("/edit"):
 	ctype, pdict = cgi.parse_header(self.headers.get('Content-Type'))

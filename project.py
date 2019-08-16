@@ -1,0 +1,48 @@
+# minimal Flask application to get going
+#
+from flask import Flask
+app = Flask(__name__)
+
+# from lesson 1 database_setup.py
+from database_setup import Base, Restaurant, MenuItem
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+
+# create a db session and connect
+engine = create_engine('sqlite:///restaurantmenu.db')
+
+# Bind the engine to the metadata of the Base class so that the
+# declaratives can be accessed through a DBSession instance
+Base.metadata.bind = engine
+
+# decorator functions = wrappers to existing functions - say what now?
+# decorators dynamically alter the functionality of a function, method or class
+# without having to directly use subclasses
+# the HelloWorld() function is wrapped by app.route()
+# if the site is visited (using host and port defined below) with either the root or /hello
+# then HelloWorld() is called
+@app.route('/')
+@app.route('/restaurants/<int:restaurant_id>/')
+def restaurantMenu(restaurant_id):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).first()
+    if restaurant:
+        items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
+        output = ''
+        output += "<html><head><title>List Menu Items</title></head><body>"
+        output += "<h2>Restaurant Name: {0}</h2>".format(restaurant.name)
+        output += "<table><tr><th>Menu Item</th><th>Price</th><th>Description</th></tr>"
+        for item in items:
+            output += "<tr><td>{0}</td> <td>{1}</td> <td>{2}</td> </tr>".format(item.name, item.price, item.description)
+        output += "</table></body>"
+        return output
+    else:
+        output = ''
+        output += "<html><head><title>List Menu Items</title></head><body>"
+        output += "<h2>No restaurant data found for ID#{0}</h2></body>".format(restaurant_id)
+        return output
+if __name__ == '__main__':
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)
+
