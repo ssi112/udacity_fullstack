@@ -1,6 +1,6 @@
 # minimal Flask application to get going
 #
-from flask import Flask
+from flask import Flask, render_template
 app = Flask(__name__)
 
 # from lesson 1 database_setup.py
@@ -15,6 +15,9 @@ engine = create_engine('sqlite:///restaurantmenu.db')
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
 
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
 # decorator functions = wrappers to existing functions - say what now?
 # decorators dynamically alter the functionality of a function, method or class
 # without having to directly use subclasses
@@ -24,19 +27,10 @@ Base.metadata.bind = engine
 @app.route('/')
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id = None):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).first()
     if restaurant:
         items = session.query(MenuItem).filter_by(restaurant_id = restaurant.id)
-        output = ''
-        output += "<html><head><title>List Menu Items</title></head><body>"
-        output += "<h2>Restaurant Name: {0}</h2>".format(restaurant.name)
-        output += "<table><tr><th>Menu Item</th><th>Price</th><th>Description</th></tr>"
-        for item in items:
-            output += "<tr><td>{0}</td> <td>{1}</td> <td>{2}</td> </tr>".format(item.name, item.price, item.description)
-        output += "</table></body>"
-        return output
+        return render_template('menu.html', restaurant=restaurant, items=items)
     else:
         output = ''
         output += "<html><head><title>List Menu Items</title></head><body>"
