@@ -1,6 +1,6 @@
 # minimal Flask application to get going
 #
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
 # from lesson 1 database_setup.py
@@ -21,9 +21,7 @@ session = DBSession()
 # decorator functions = wrappers to existing functions - say what now?
 # decorators dynamically alter the functionality of a function, method or class
 # without having to directly use subclasses
-# the HelloWorld() function is wrapped by app.route()
-# if the site is visited (using host and port defined below) with either the root or /hello
-# then HelloWorld() is called
+
 @app.route('/')
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id = None):
@@ -37,11 +35,21 @@ def restaurantMenu(restaurant_id = None):
         output += "<h2>No restaurant data found for ID#{0}</h2></body>".format(restaurant_id)
         return output
 
-
+# -----------------------------------------------------------------------------------------
 # Task 1: Create route for newMenuItem function here
-@app.route('/restaurant/<int:restaurant_id>/new')
+@app.route('/restaurant/<int:restaurant_id>/new', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
-    return "page to create a new menu item. Task 1 complete!"
+    if request.method == 'POST':
+        newItem = MenuItem( name = request.form['name'],
+                            restaurant_id = restaurant_id,
+                            course = request.form['course'],
+                            description = request.form['description'],
+                            price = request.form['price'] )
+        session.add(newItem)
+        session.commit()
+        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+    else:
+        return render_template('newmenuitem.html', restaurant_id=restaurant_id)
 
 
 # Task 2: Create route for editMenuItem function here
