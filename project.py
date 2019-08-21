@@ -22,7 +22,19 @@ session = DBSession()
 # decorators dynamically alter the functionality of a function, method or class
 # without having to directly use subclasses
 
+# -----------------------------------------------------------------------------------------
 @app.route('/')
+@app.route('/restaurants/')
+def listRestaurants():
+    restaurants = session.query(Restaurant).all()
+    if restaurants:
+        return render_template('listrestaurants.html', restaurants=restaurants)
+    else:
+        output = ''
+        output += "<html><head><title>List Restaurants</title></head><body>"
+        output += "<h2>No restaurant data found in database</h2></body>"
+        return output
+
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id = None):
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).first()
