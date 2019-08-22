@@ -1,6 +1,6 @@
 # minimal Flask application to get going
 #
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 app = Flask(__name__)
 
 # from lesson 1 database_setup.py
@@ -18,9 +18,33 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 # decorator functions = wrappers to existing functions - say what now?
 # decorators dynamically alter the functionality of a function, method or class
 # without having to directly use subclasses
+
+# -----------------------------------------------------------------------------------------
+# API endpoint: GET requests
+# ALL menu items
+@app.route('/restaurants/<int:restaurant_id>/menu/JSON')
+def getRestaurantMenuJSON(restaurant_id):
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).first()
+    if restaurant:
+        items = session.query(MenuItem).filter_by(restaurant_id=restaurant_id).all()
+        return jsonify(MenuItems=[i.serialize for i in items])
+    else:
+        # return nothing but give OK status code
+        return Response(status = 200)
+
+# ONE menu item
+@app.route('/restaurants/menu/<int:menu_id>/JSON')
+def getMenuItemJSON(menu_id):
+    menuItem = session.query(MenuItem).filter_by(id=menu_id).first()
+    if menuItem:
+        return jsonify(MenuItem=menuItem.serialize)
+    else:
+        return Response(status = 200)
+
 
 # -----------------------------------------------------------------------------------------
 @app.route('/')
@@ -35,6 +59,7 @@ def listRestaurants():
         output += "<h2>No restaurant data found in database</h2></body>"
         return output
 
+# -----------------------------------------------------------------------------------------
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id = None):
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).first()
