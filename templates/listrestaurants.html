@@ -14,7 +14,9 @@
             </tr>
             {% for restaurant in restaurants %}
             <tr>
-                <td>{{restaurant.id}}</td>
+                <td>
+                    <a href= "{{url_for('restaurantMenu', restaurant_id = restaurant.id)}}">{{restaurant.id}}</a>
+                </td>
                 <td>{{restaurant.name}}</td>
             </tr>
             {% endfor %}
